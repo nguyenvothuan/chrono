@@ -79,6 +79,13 @@ With collaborative efforts from the CTO office, we have prepared this Django Boi
 
  * Clone this repo
  * Install python3.10
+ * Create virtual env directory:
+    ```
+    python3 -m venv name-of-venv (e.g. venv).
+    ```
+ * Activate virtual env:
+    ```
+    source name-of-venv(e.g. venv)/bin/activate
  * Intall dependencies:
 > pip install -r requirements.txt
  * Run the server:
