@@ -88,8 +88,11 @@ With collaborative efforts from the CTO office, we have prepared this Django Boi
     source name-of-venv(e.g. venv)/bin/activate
  * Intall dependencies:
 > pip install -r requirements.txt
+ * Migrate to SQLite:
+> python manage.py migrate
  * Run the server:
 > python manage.py runserver
+ * Server is up at: http://127.0.0.1:8000/api/v1.0/boilerplate_apps/docs/
 -----
 Docker Setup
 ---
