@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'graphene_django',
     'drf_yasg',
     'boilerplate_app',
+    'account',
+    'company',
 ]
 
 MIDDLEWARE = [
