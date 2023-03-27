@@ -108,5 +108,5 @@ db.sqlite3
 # IDEA
 .idea/
 
-data_export/
-!data_export/loaddata.py
+data_export/*
+!data_export/load_data.py
