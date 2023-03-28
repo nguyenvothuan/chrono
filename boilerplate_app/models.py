@@ -44,6 +44,7 @@ class AutoDateTimeField(models.DateTimeField):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    id = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=80, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
