@@ -15,5 +15,5 @@ class Account(models.Model):
         Company, on_delete=models.CASCADE, blank=True, null=True, default=None
     )
     positionTitle = models.CharField(max_length=100, blank=True, default="")
-    startDate = models.DateField(default=datetime.now())
+    startDate = models.DateField(default=datetime.now)
     isManager = models.BooleanField(default=False)
