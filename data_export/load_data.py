@@ -1,9 +1,9 @@
 from account.models import Account
 from boilerplate_app.models import User
 from company.models import Company
+from util import get_company_employee_id
 import json
 import datetime
-
 
 def dump_employee():
     for file in ["Onion_Technology-employees", "GizmoGram-employees", "LunchRock_LLC-employees", "Night_Owls_Inc-employees"]:
@@ -54,9 +54,15 @@ def dump_employee():
             account.company = company
             account.save()
 
+
 def dump_manager():
     # there is no functionality that requires manager now so simply skip this step
     pass
 
+
 def dump_time_series():
-    pass
+    for file in ["GizmoGram-employees"]:
+        with open(f"data_export/{file}-time-entries.json") as f:
+            time_entries = json.load(f)
+            for time_entry in time_entries:
+                print(time_entry['employeeId'], time_entry['companyId'])
