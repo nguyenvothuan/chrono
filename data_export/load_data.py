@@ -1,4 +1,5 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
+from django.db.models import F
 from account.models import Account
 from boilerplate_app.models import User
 from company.models import Company
@@ -7,7 +8,7 @@ from data_export.util import get_company_employee_id, get_account_id, compute_ho
 import json
 import datetime
 
-
+@transaction.atomic
 def dump_employee():
     for file in ["Onion_Technology-employees", "GizmoGram-employees", "LunchRock_LLC-employees", "Night_Owls_Inc-employees"]:
         with open(f"data_export/{file}.json") as f:
@@ -62,9 +63,9 @@ def dump_manager():
     # there is no functionality that requires manager now so simply skip this step
     pass
 
-
+@transaction.atomic
 def dump_time_entries():
-    for file in ["Onion_Technology", "Night_Owls_Inc", "LunchRock_LLC", "GizmoGram"]:
+    for file in [ "LunchRock_LLC","Onion_Technology", "Night_Owls_Inc", "GizmoGram"]:
         with open(f"data_export/{file}-time-entries.json") as f:
             time_entries = json.load(f)
             companyId = 1
@@ -98,10 +99,14 @@ def dump_time_entries():
                             'clockedInEpochMillisecond'), entry.get('clockedOutEpochMillisecond'))
                         date = datetime.date.fromtimestamp(
                             entry.get('clockedInEpochMillisecond')/1000)
-                    #handle case when there are two clock in clock out a day
+                    # handle case when there are two clock in clock out a day
                     try:
-                        newEntry, _ = TimeEntry.objects.get_or_create(
-                            date=date, account=account, hoursWorked=hoursWorked)
+                        newEntry, created = TimeEntry.objects.get_or_create(
+                            date=date, account=account, defaults={"hoursWorked": hoursWorked})
+                        # data was created before, update the new time.
+                        if not created:
+                            newEntry.hoursWorked+=F('hoursWorked')+hoursWorked
+                            newEntry.save()
                     except IntegrityError as e:
                         print(account, date)
                         print(e)
