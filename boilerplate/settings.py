@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'boilerplate_app',
     'account',
     'company',
+    'time_entry',
 ]
 
 MIDDLEWARE = [
