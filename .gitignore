@@ -110,3 +110,4 @@ db.sqlite3
 
 data_export/*
 !data_export/load_data.py
+master_app.log.*
