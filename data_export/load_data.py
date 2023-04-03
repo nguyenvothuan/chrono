@@ -116,5 +116,5 @@ def flush_time_entries():
     TimeEntry.objects.all().delete()
 
 
-# dump_employee()
-dump_time_entries()
+dump_employee()
+# dump_time_entries()
