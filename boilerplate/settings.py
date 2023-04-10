@@ -28,6 +28,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    # TODO: Move allowed origin, secret keys, database host, port, etc. to environment variables 
+    # (instead of directly setting in this file) for easy configuring the project in other environments.
+
+    # TODO: add cors allowed origin for the frontend. Currently, only allow the server to call itself.
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+]
 
 # Application definition
 
