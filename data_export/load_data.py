@@ -8,7 +8,7 @@ from data_export.util import get_company_employee_id, get_account_id, compute_ho
 import json
 import datetime
 
-@transaction.atomic
+# @transaction.atomic
 def dump_employee():
     for file in ["Onion_Technology-employees", "GizmoGram-employees", "LunchRock_LLC-employees", "Night_Owls_Inc-employees"]:
         with open(f"data_export/{file}.json") as f:
@@ -116,5 +116,5 @@ def flush_time_entries():
     TimeEntry.objects.all().delete()
 
 
-dump_employee()
+# dump_employee()
 # dump_time_entries()
