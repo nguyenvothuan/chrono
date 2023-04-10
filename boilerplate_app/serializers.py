@@ -18,7 +18,9 @@ from rest_framework import serializers
 
 # local imports.
 from boilerplate_app.models import User, Projects
-
+from time_entry.models import TimeEntry
+from account.models import Account
+from django.db import models
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -64,3 +66,15 @@ class ProjectsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects
         fields = ('id', 'project_name', 'user')
+
+#Time entry serializer for processing json files
+class TimeEntryCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeEntry
+        fields = ('account',)
+
+    def create(self, validated_data):
+        accountID = Account.objects.get(pk = validated_data.pop('account'))
+        dateCurr = datetime.date.today()
+        punchInTime = datetime.datetime.now().time()
+        return TimeEntry.objects.create(date = dateCurr, punchInTime = punchInTime, account = accountID)

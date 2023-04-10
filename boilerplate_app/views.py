@@ -20,7 +20,8 @@ from boilerplate_app.models import User, Projects
 from boilerplate_app.serializers import ( UserCreateSerializer, 
                                     UserListSerializer,     
                                     ProjectsCreateSerializer,
-                                    ProjectsListSerializer)
+                                    ProjectsListSerializer,
+                                    TimeEntryCreateSerializer)
 from boilerplate_app.utils import generate_jwt_token
 from boilerplate_app.tasks import add
 
@@ -186,3 +187,39 @@ class ProjectAPIView(GenericAPIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+        
+
+class PunchInAPIView(CreateAPIView):
+    serializer_class = TimeEntryCreateSerializer
+    #permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        """
+        punch in
+        """
+        
+        try:
+            data = request.data
+            #data['account'] = request.account.pk
+            serializer = TimeEntryCreateSerializer(data = data)
+
+            if serializer.is_valid():
+                timeEntry = serializer.create(serializer.data)
+                return Response({'status': True,
+                        'Account': timeEntry.account.id,
+                        'Time entry date': timeEntry.date,
+                        'Punch in eime': timeEntry.punchInTime,
+                        'message': "Punched In Successfully"},
+                        status=status.HTTP_200_OK)
+            else:
+                message = ''
+                for error in serializer.errors.values():
+                    message += " "
+                    message += error[0]
+                return Response({'status': False,
+                                 'message': message},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+    

@@ -18,7 +18,8 @@ from boilerplate_app.views import (
                           ProjectAPIView, 
                           RegistrationAPIView,
                           LoginView,
-                          LogoutView
+                          LogoutView,
+                          PunchInAPIView
                           )
 from boilerplate_app.swagger import schema_view
 
@@ -34,5 +35,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout-api'),
     path('list/users/', UserAPIView.as_view(), name='user-api'),
     path('project/', ProjectAPIView.as_view(), name='project-api'),
+    #test
+    path('punchIn/', PunchInAPIView.as_view(), name='punchin-api'),
+
     path('docs/', schema_view.with_ui("swagger", cache_timeout=0), name="schema_view"),
 ]
