@@ -9,6 +9,8 @@ import json
 import datetime
 
 # @transaction.atomic
+
+
 def dump_employee():
     for file in ["Onion_Technology-employees", "GizmoGram-employees", "LunchRock_LLC-employees", "Night_Owls_Inc-employees"]:
         with open(f"data_export/{file}.json") as f:
@@ -59,13 +61,28 @@ def dump_employee():
             account.save()
 
 
+@transaction.atomic
 def dump_manager():
-    # there is no functionality that requires manager now so simply skip this step
-    pass
+    for file in ["Onion_Technology-employees", "GizmoGram-employees", "LunchRock_LLC-employees", "Night_Owls_Inc-employees"]:
+        with open(f"data_export/{file}.json") as f:
+            employees = json.load(f)
+
+        for employee in employees:
+            # if the employee has a manager
+            if 'managerId' in employee:
+                userId = 10000*employee.get("companyId") + \
+                    employee.get("employeeId")
+                managerId = 10000*employee.get("companyId") + \
+                    employee.get("managerId")
+                user = Account.objects.get(pk=userId)
+                manager = Account.objects.get(pk=managerId)
+                user.manager = manager
+                user.save()
+
 
 @transaction.atomic
 def dump_time_entries():
-    for file in [ "LunchRock_LLC","Onion_Technology", "Night_Owls_Inc", "GizmoGram"]:
+    for file in ["LunchRock_LLC", "Onion_Technology", "Night_Owls_Inc", "GizmoGram"]:
         with open(f"data_export/{file}-time-entries.json") as f:
             time_entries = json.load(f)
             companyId = 1
@@ -105,7 +122,8 @@ def dump_time_entries():
                             date=date, account=account, defaults={"hoursWorked": hoursWorked})
                         # data was created before, update the new time.
                         if not created:
-                            newEntry.hoursWorked+=F('hoursWorked')+hoursWorked
+                            newEntry.hoursWorked += F('hoursWorked') + \
+                                hoursWorked
                             newEntry.save()
                     except IntegrityError as e:
                         print(account, date)
@@ -118,3 +136,4 @@ def flush_time_entries():
 
 # dump_employee()
 # dump_time_entries()
+dump_manager()
