@@ -20,8 +20,9 @@ from django.urls import path, include
 from graphene_django.views import GraphQLView
 
 urlpatterns = [
-                  path('admin/', admin.site.urls),
-                  path('',
-                       include("boilerplate_app.urls", namespace="boilerplate_app-api")),
-                  path("graphql/", GraphQLView.as_view(graphiql=True)),
-              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('admin/', admin.site.urls),
+    path('',
+         include("boilerplate_app.urls", namespace="boilerplate_app-api")),
+    path('api/accounts/', include('account.urls', namespace='accounts-api')),
+    path("graphql/", GraphQLView.as_view(graphiql=True)),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
