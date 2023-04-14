@@ -21,3 +21,4 @@ def compute_hours_between_clock_times(clocked_in, clocked_out):
     clocked_out_time = datetime.strptime(clocked_out, '%H:%M:%S')
     hours_worked = clocked_out_time - clocked_in_time
     return round(hours_worked.total_seconds() / 3600.0, 2)
+
