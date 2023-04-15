@@ -13,9 +13,11 @@ from django.urls import path
 
 # local imports.
 from account.views import Punch
+from account.views  import GetStartTime
 
 app_name = 'accounts'
 
 urlpatterns = [
     path('punch', Punch.as_view(), name='punch in punch out'), 
+    path('GetStartTime', GetStartTime.as_view(), name = "get start time")
 ]
