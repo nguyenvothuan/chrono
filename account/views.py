@@ -40,3 +40,16 @@ class Punch(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+
+class HoursWorked(APIView):
+    def get(self, request):
+        try:
+            date = request.GET.get('date')
+            user = request.user
+            account = user.account_set.first()
+            time_entries = TimeEntry.objects.filter(account=account, date=date)
+            entry = time_entries.first()
+            return Response({"Date": date, "Hours": entry.hoursWorked}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)

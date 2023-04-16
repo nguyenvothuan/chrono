@@ -12,10 +12,11 @@ from django.urls import path
 # Third Party Library imports
 
 # local imports.
-from account.views import Punch
+from account.views import Punch, HoursWorked
 
 app_name = 'accounts'
 
 urlpatterns = [
     path('punch', Punch.as_view(), name='punch in punch out'), 
+    re_path(r'^hoursWorked/$', HoursWorked.as_view(), name='hours worked')
 ]
