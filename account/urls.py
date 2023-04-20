@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import logging
 
 # Django imports.
-from django.urls import path
+from django.urls import path, re_path
 
 # Rest Framework imports.
 
@@ -18,5 +18,5 @@ app_name = 'accounts'
 
 urlpatterns = [
     path('punch', Punch.as_view(), name='punch in punch out'), 
-    re_path(r'^hoursWorked/$', HoursWorked.as_view(), name='hours worked')
+    path('hoursWorked', HoursWorked.as_view(), name='hours worked')
 ]
