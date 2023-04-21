@@ -48,12 +48,40 @@ class Punch(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetStartTime(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            account = user.account_set.first()
+            today = datetime.today().date()
+            time_entries = TimeEntry.objects.filter(
+                account=account, date=today)
+
+            if time_entries.count() == 0:
+                return Response({'status': 'success', 'Response': {'start time': None}},
+                                status=status.HTTP_200_OK)
+            else:
+                entry = time_entries.first()
+                if entry.start_time == None:
+                    return Response({'status': 'success', 'Response': {'start time': None}},
+                                    status=status.HTTP_200_OK)
+                else:
+                    time = entry.start_time
+                    return Response({'status': 'success', 'Response': {'start time': time}},
+                                    status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
 date = openapi.Parameter('date', in_=openapi.IN_QUERY,
                          type=openapi.TYPE_STRING)
 from_date = openapi.Parameter('from_date', in_=openapi.IN_QUERY,
                               type=openapi.TYPE_STRING)
 to_date = openapi.Parameter('to_date', in_=openapi.IN_QUERY,
                             type=openapi.TYPE_STRING)
+
 
 class HoursWorked(APIView):
     @swagger_auto_schema(
@@ -86,7 +114,7 @@ class HoursWorked(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
                 return Response({"Date": date, "Hours": entry.hoursWorked}, status=status.HTTP_200_OK)
             else:
-                time_entries = TimeEntry.objects.filter(account=account)
+                time_entries = TimeEntry.objects.filter(account=account)[:20]
                 if time_entries == None:
                     return Response({'status': False, 'message': "No time entries for this user"},
                                     status=status.HTTP_400_BAD_REQUEST)
