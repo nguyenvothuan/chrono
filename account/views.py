@@ -15,7 +15,6 @@ class Punch(APIView):
     def post(self, request):
         try:
             user = request.user
-            print(user)
             # there is only one account for each user, and vice-versa
             account = user.account_set.first()
             now = datetime.now().time()
@@ -48,27 +47,55 @@ class Punch(APIView):
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-date = openapi.Parameter('date', in_=openapi.IN_QUERY,
-                           type=openapi.TYPE_STRING)
 
+date = openapi.Parameter('date', in_=openapi.IN_QUERY,
+                         type=openapi.TYPE_STRING)
+from_date = openapi.Parameter('from_date', in_=openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING)
+to_date = openapi.Parameter('to_date', in_=openapi.IN_QUERY,
+                            type=openapi.TYPE_STRING)
 
 class HoursWorked(APIView):
     @swagger_auto_schema(
-        manual_parameters=[date],
+        manual_parameters=[date, from_date, to_date],
     )
     def get(self, request):
         try:
-            date = request.GET.get('date')
-            print(date)
             user = request.user
-            print(user)
             account = user.account_set.first()
-            time_entries = TimeEntry.objects.filter(account=account, date=date)
-            entry = time_entries.first()
-            if entry == None:
-                return Response({'status': False, 'message': "No time entry for the specific date"},
-                            status=status.HTTP_400_BAD_REQUEST)
-            return Response({"Date": date, "Hours": entry.hoursWorked}, status=status.HTTP_200_OK)
+            date = request.GET.get('date')
+            from_date = request.GET.get('from_date')
+            to_date = request.GET.get('to_date')
+            if from_date != None and to_date != None:
+                time_entries = TimeEntry.objects.filter(
+                    account=account, date__range=[from_date, to_date])
+                if time_entries == None:
+                    return Response({'status': False, 'message': "No time entries for this user"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                results = []
+                for time_entry in time_entries:
+                    results.append(
+                        {"Date": time_entry.date, "Hours": time_entry.hoursWorked})
+                return Response(results, status=status.HTTP_200_OK)
+            elif date != None:
+                time_entries = TimeEntry.objects.filter(
+                    account=account, date=date)
+                entry = time_entries.first()
+                if entry == None:
+                    return Response({'status': False, 'message': "No time entry for the specific date"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                return Response({"Date": date, "Hours": entry.hoursWorked}, status=status.HTTP_200_OK)
+            else:
+                time_entries = TimeEntry.objects.filter(account=account)
+                if time_entries == None:
+                    return Response({'status': False, 'message': "No time entries for this user"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                results = []
+                for time_entry in time_entries:
+                    results.append(
+                        {"Date": time_entry.date, "Hours": time_entry.hoursWorked})
+
+                return Response(results, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
