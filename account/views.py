@@ -47,6 +47,31 @@ class Punch(APIView):
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
+class GetStartTime(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            account = user.account_set.first()
+            today = datetime.today().date()
+            time_entries = TimeEntry.objects.filter(account=account, date=today)
+
+            if time_entries.count() == 0:
+                return Response({'status': 'success', 'Response': {'start time': None}}, 
+                                status=status.HTTP_200_OK)
+            else:
+                entry = time_entries.first()
+                if entry.start_time == None:
+                    return Response({'status': 'success', 'Response': {'start time': None}}, 
+                                status=status.HTTP_200_OK)
+                else:
+                    time = entry.start_time
+                    return Response({'status': 'success', 'Response': {'start time': time}}, 
+                                status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
 
 date = openapi.Parameter('date', in_=openapi.IN_QUERY,
                          type=openapi.TYPE_STRING)
