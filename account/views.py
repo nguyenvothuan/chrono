@@ -114,7 +114,7 @@ class HoursWorked(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
                 return Response({"Date": date, "Hours": entry.hoursWorked}, status=status.HTTP_200_OK)
             else:
-                time_entries = TimeEntry.objects.filter(account=account)[:20]
+                time_entries = TimeEntry.objects.filter(account=account)
                 if time_entries == None:
                     return Response({'status': False, 'message': "No time entries for this user"},
                                     status=status.HTTP_400_BAD_REQUEST)
