@@ -12,11 +12,13 @@ from django.urls import path
 # Third Party Library imports
 
 # local imports.
-from account.views import Punch, GetStartTime
+from account.views import Punch, GetStartTime, Me
 
 app_name = 'accounts'
 
 urlpatterns = [
     path('punch', Punch.as_view(), name='punch in punch out'), 
-    path('punch-in-time', GetStartTime.as_view(), name = "get punch in time")
+    path('punch-in-time', GetStartTime.as_view(), name = "get punch in time"),
+
+    path('me', Me.as_view(), name = "get user information")
 ]
