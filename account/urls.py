@@ -5,18 +5,20 @@ from __future__ import unicode_literals
 import logging
 
 # Django imports.
-from django.urls import path
+from django.urls import path, re_path
 
 # Rest Framework imports.
 
 # Third Party Library imports
 
 # local imports.
-from account.views import Punch, GetStartTime
+
+from account.views import Punch, GetStartTime, HoursWorked
 
 app_name = 'accounts'
 
 urlpatterns = [
     path('punch', Punch.as_view(), name='punch in punch out'), 
+    path('hoursWorked', HoursWorked.as_view(), name='hours worked'),
     path('punch-in-time', GetStartTime.as_view(), name = "get punch in time")
 ]
