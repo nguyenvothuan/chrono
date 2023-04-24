@@ -7,7 +7,7 @@ from account.models import Account
 from account.utils import date_field_from_date
 from datetime import datetime
 from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema, APIView
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
 
