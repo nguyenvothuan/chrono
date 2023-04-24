@@ -72,7 +72,11 @@ class Me(APIView):
             user = request.user
             account = user.account_set.first()
             company = account.company.name
-            manager = account.manager.user.first_name + ' ' + account.manager.user.last_name
+            hasManager = account.manager
+            if(hasManager != None):
+                manager = account.manager.user.first_name + ' ' + account.manager.user.last_name
+            else:
+                manager = None
             email = user.email
             first_name = user.first_name
             last_name = user.last_name
