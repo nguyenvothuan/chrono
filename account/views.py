@@ -127,3 +127,25 @@ class HoursWorked(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+        
+class Me(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            account = user.account_set.first()
+            company = account.company.name
+            hasManager = account.manager
+            if(hasManager != None):
+                manager = account.manager.user.first_name + ' ' + account.manager.user.last_name
+            else:
+                manager = None
+            email = user.email
+            first_name = user.first_name
+            last_name = user.last_name
+
+            return Response({'status': 'success', 'Response': {'email':email, 'first_name':first_name, 'last_name':last_name, 'company':company, 'manager':manager}}, 
+                                status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
