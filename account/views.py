@@ -104,7 +104,7 @@ class HoursWorked(APIView):
                 for time_entry in time_entries:
                     results.append(
                         {"Date": time_entry.date, "Hours": time_entry.hoursWorked})
-                return Response(results, status=status.HTTP_200_OK)
+                return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
             elif date != None:
                 time_entries = TimeEntry.objects.filter(
                     account=account, date=date)
@@ -123,7 +123,7 @@ class HoursWorked(APIView):
                     results.append(
                         {"Date": time_entry.date, "Hours": time_entry.hoursWorked})
 
-                return Response(results, status=status.HTTP_200_OK)
+                return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -146,6 +146,40 @@ class Me(APIView):
             return Response({'status': 'success', 'Response': {'email':email, 'first_name':first_name, 'last_name':last_name, 'company':company, 'manager':manager}}, 
                                 status=status.HTTP_200_OK)
 
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+employee_id = openapi.Parameter('id', in_=openapi.IN_QUERY,
+                         type=openapi.TYPE_STRING)   
+
+class GetEmployeeInfo(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[employee_id],
+    )
+    def get(self, request):
+        try:
+            user = request.user
+            account = user.account_set.first()
+            manager_id = account.id
+
+            employee_id = request.GET.get('id')
+            if employee_id != None:
+                employee_account = Account.objects.filter(id=employee_id)[0]
+                if employee_account.manager.id == manager_id:
+                    return Response({'status': 'success', 'Response': {'email': employee_account.user.email, 'first_name': employee_account.user.first_name, 'last_name': employee_account.user.last_name, 'company': employee_account.company.name}}, 
+                                status=status.HTTP_200_OK)
+                
+            employees = Account.objects.filter(manager=account)[:20]
+            if employees == None:
+                    return Response({'status': "success", 'message': "No employees for this user"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+            results = []
+            for employee in employees:
+                    results.append(
+                        {'email': employee.user.email, 'first_name': employee.user.first_name, 'last_name': employee.user.last_name, 'company': employee.company.name})
+
+            return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
