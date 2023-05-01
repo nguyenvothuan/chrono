@@ -173,7 +173,7 @@ class GetEmployeeInfo(APIView):
             employees = Account.objects.filter(manager=account)[:20]
             if employees == None:
                     return Response({'status': "success", 'message': "No employees for this user"},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                                    status=status.HTTP_403_FORBIDDEN)
             results = []
             for employee in employees:
                     results.append(
