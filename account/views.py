@@ -165,14 +165,22 @@ class GetEmployeeInfo(APIView):
 
             employee_id = request.GET.get('id')
             if employee_id != None:
-                employee_account = Account.objects.filter(id=employee_id)[0]
-                if employee_account.manager.id == manager_id:
-                    return Response({'status': 'success', 'Response': {'email': employee_account.user.email, 'first_name': employee_account.user.first_name, 'last_name': employee_account.user.last_name, 'company': employee_account.company.name}}, 
+                employee_accounts = Account.objects.filter(id=employee_id)
+                if len(employee_accounts) == 0:
+                    return Response({'status': False, 'message': "Invalid employee id"},
+                                    status=status.HTTP_403_FORBIDDEN)
+                employee_account = employee_accounts[0]
+
+                if employee_account.manager == None or employee_account.manager.id != manager_id:
+                    return Response({'status': False, 'message': "Data is forbidden"},
+                                    status=status.HTTP_403_FORBIDDEN)
+
+                return Response({'status': 'success', 'Response': {'email': employee_account.user.email, 'first_name': employee_account.user.first_name, 'last_name': employee_account.user.last_name, 'company': employee_account.company.name}}, 
                                 status=status.HTTP_200_OK)
                 
             employees = Account.objects.filter(manager=account)[:20]
             if employees == None:
-                    return Response({'status': "success", 'message': "No employees for this user"},
+                    return Response({'status': False, 'message': "No employees for this user"},
                                     status=status.HTTP_403_FORBIDDEN)
             results = []
             for employee in employees:
