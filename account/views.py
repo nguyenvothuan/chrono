@@ -8,6 +8,7 @@ from account.utils import date_field_from_date
 from datetime import datetime
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import serializers
 # Create your views here.
 
 
@@ -74,16 +75,13 @@ class GetStartTime(APIView):
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-
-date = openapi.Parameter('date', in_=openapi.IN_QUERY,
-                         type=openapi.TYPE_STRING)
-from_date = openapi.Parameter('from_date', in_=openapi.IN_QUERY,
-                              type=openapi.TYPE_STRING)
-to_date = openapi.Parameter('to_date', in_=openapi.IN_QUERY,
-                            type=openapi.TYPE_STRING)
-
-
 class HoursWorked(APIView):
+    date = openapi.Parameter('date', in_=openapi.IN_QUERY,
+                         type=openapi.TYPE_STRING)
+    from_date = openapi.Parameter('from_date', in_=openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING)
+    to_date = openapi.Parameter('to_date', in_=openapi.IN_QUERY,
+                            type=openapi.TYPE_STRING)
     @swagger_auto_schema(
         manual_parameters=[date, from_date, to_date],
     )
@@ -104,7 +102,7 @@ class HoursWorked(APIView):
                 for time_entry in time_entries:
                     results.append(
                         {"Date": time_entry.date, "Hours": time_entry.hoursWorked})
-                return Response(results, status=status.HTTP_200_OK)
+                return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
             elif date != None:
                 time_entries = TimeEntry.objects.filter(
                     account=account, date=date)
@@ -123,7 +121,7 @@ class HoursWorked(APIView):
                     results.append(
                         {"Date": time_entry.date, "Hours": time_entry.hoursWorked})
 
-                return Response(results, status=status.HTTP_200_OK)
+                return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -146,6 +144,63 @@ class Me(APIView):
             return Response({'status': 'success', 'Response': {'email':email, 'first_name':first_name, 'last_name':last_name, 'company':company, 'manager':manager}}, 
                                 status=status.HTTP_200_OK)
 
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class EmployeeInfo:
+    def __init__(self, email, first_name, last_name, company):
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+        self.company = company
+
+class EmployeeInfoSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    company = serializers.CharField()
+
+class GetEmployeeInfo(APIView):
+    employee_id = openapi.Parameter('id', in_=openapi.IN_QUERY,
+                         type=openapi.TYPE_STRING)   
+    @swagger_auto_schema(
+        manual_parameters=[employee_id],
+    )
+    def get(self, request):
+        try:
+            user = request.user
+            account = user.account_set.first()
+            manager_id = account.id
+
+            employee_id = request.GET.get('id')
+            if employee_id != None:
+                employee_accounts = Account.objects.filter(id=employee_id)
+                if len(employee_accounts) == 0:
+                    return Response({'status': False, 'message': "Invalid employee id"},
+                                    status=status.HTTP_403_FORBIDDEN)
+                employee_account = employee_accounts[0]
+
+                if employee_account.manager == None or employee_account.manager.id != manager_id:
+                    return Response({'status': False, 'message': "Data is forbidden"},
+                                    status=status.HTTP_403_FORBIDDEN)
+                employeeInfo = EmployeeInfo(employee_account.user.email, employee_account.user.first_name, employee_account.user.last_name, employee_account.company.name)
+                serializer = EmployeeInfoSerializer(employeeInfo)
+                return Response({'status': 'success', 'Response': serializer.data}, 
+                                status=status.HTTP_200_OK)
+                
+            employees = Account.objects.filter(manager=account)[:20]
+            if employees == None:
+                    return Response({'status': False, 'message': "No employees for this user"},
+                                    status=status.HTTP_403_FORBIDDEN)
+            results = []
+            for employee in employees:
+                    employeeInfo = EmployeeInfo(employee.user.email, employee.user.first_name, employee.user.last_name, employee.company.name)
+                    serializer = EmployeeInfoSerializer(employeeInfo)
+                    results.append(
+                        serializer.data)
+
+            return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
