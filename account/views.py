@@ -75,16 +75,13 @@ class GetStartTime(APIView):
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-
-date = openapi.Parameter('date', in_=openapi.IN_QUERY,
-                         type=openapi.TYPE_STRING)
-from_date = openapi.Parameter('from_date', in_=openapi.IN_QUERY,
-                              type=openapi.TYPE_STRING)
-to_date = openapi.Parameter('to_date', in_=openapi.IN_QUERY,
-                            type=openapi.TYPE_STRING)
-
-
 class HoursWorked(APIView):
+    date = openapi.Parameter('date', in_=openapi.IN_QUERY,
+                         type=openapi.TYPE_STRING)
+    from_date = openapi.Parameter('from_date', in_=openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING)
+    to_date = openapi.Parameter('to_date', in_=openapi.IN_QUERY,
+                            type=openapi.TYPE_STRING)
     @swagger_auto_schema(
         manual_parameters=[date, from_date, to_date],
     )
@@ -151,9 +148,6 @@ class Me(APIView):
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-employee_id = openapi.Parameter('id', in_=openapi.IN_QUERY,
-                         type=openapi.TYPE_STRING)   
-
 class EmployeeInfo:
     def __init__(self, email, first_name, last_name, company):
         self.email = email
@@ -168,6 +162,8 @@ class EmployeeInfoSerializer(serializers.Serializer):
     company = serializers.CharField()
 
 class GetEmployeeInfo(APIView):
+    employee_id = openapi.Parameter('id', in_=openapi.IN_QUERY,
+                         type=openapi.TYPE_STRING)   
     @swagger_auto_schema(
         manual_parameters=[employee_id],
     )
