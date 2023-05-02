@@ -8,6 +8,7 @@ from account.utils import date_field_from_date
 from datetime import datetime
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import serializers
 # Create your views here.
 
 
@@ -153,6 +154,19 @@ class Me(APIView):
 employee_id = openapi.Parameter('id', in_=openapi.IN_QUERY,
                          type=openapi.TYPE_STRING)   
 
+class EmployeeInfo:
+    def __init__(self, email, first_name, last_name, company):
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+        self.company = company
+
+class EmployeeInfoSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    company = serializers.CharField()
+
 class GetEmployeeInfo(APIView):
     @swagger_auto_schema(
         manual_parameters=[employee_id],
@@ -174,8 +188,9 @@ class GetEmployeeInfo(APIView):
                 if employee_account.manager == None or employee_account.manager.id != manager_id:
                     return Response({'status': False, 'message': "Data is forbidden"},
                                     status=status.HTTP_403_FORBIDDEN)
-
-                return Response({'status': 'success', 'Response': {'email': employee_account.user.email, 'first_name': employee_account.user.first_name, 'last_name': employee_account.user.last_name, 'company': employee_account.company.name}}, 
+                employeeInfo = EmployeeInfo(employee_account.user.email, employee_account.user.first_name, employee_account.user.last_name, employee_account.company.name)
+                serializer = EmployeeInfoSerializer(employeeInfo)
+                return Response({'status': 'success', 'Response': serializer.data}, 
                                 status=status.HTTP_200_OK)
                 
             employees = Account.objects.filter(manager=account)[:20]
@@ -184,8 +199,10 @@ class GetEmployeeInfo(APIView):
                                     status=status.HTTP_403_FORBIDDEN)
             results = []
             for employee in employees:
+                    employeeInfo = EmployeeInfo(employee.user.email, employee.user.first_name, employee.user.last_name, employee.company.name)
+                    serializer = EmployeeInfoSerializer(employeeInfo)
                     results.append(
-                        {'email': employee.user.email, 'first_name': employee.user.first_name, 'last_name': employee.user.last_name, 'company': employee.company.name})
+                        serializer.data)
 
             return Response({'status': 'success', 'Response': results}, status=status.HTTP_200_OK)
         except Exception as e:
