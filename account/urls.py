@@ -21,6 +21,6 @@ urlpatterns = [
     path('hoursWorked', HoursWorked.as_view(), name='hours worked'),
     path('punch-in-time', GetStartTime.as_view(), name = "get punch in time"),
     path('me', Me.as_view(), name = "get user information"),
-    path('manager/employees/id', EditEmployeeWorkHour.as_view(), name = "edit employee info")
-    path('api/manager/employees', GetEmployeeInfo.as_view(), name = "get employee info")
+    path('manager/employees/id', EditEmployeeWorkHour.as_view(), name = "edit employee info"),
+    path('api/manager/employees', GetEmployeeInfo.as_view(), name = "get employee info"),
 ]
