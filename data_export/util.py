@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import math
+
 def get_company_employee_id(id):
     res = {}
     res['company_id'] = id % 10000
@@ -19,6 +21,5 @@ def compute_hours_between_clock_times(clocked_in, clocked_out):
     
     clocked_in_time = datetime.strptime(clocked_in, '%H:%M:%S')
     clocked_out_time = datetime.strptime(clocked_out, '%H:%M:%S')
-    hours_worked = clocked_out_time - clocked_in_time
+    hours_worked = math.abs(clocked_out_time - clocked_in_time)
     return round(hours_worked.total_seconds() / 3600.0, 2)
-
