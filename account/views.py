@@ -148,6 +148,7 @@ class Me(APIView):
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
+
 class EmployeeInfo:
     def __init__(self, email, first_name, last_name, company):
         self.email = email
@@ -204,3 +205,49 @@ class GetEmployeeInfo(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+                            
+
+class EditEmployeeWorkHour(APIView):
+    Input_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'date': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+        'hoursWorked': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+    },
+    required=['date', 'hoursWorked']
+    )
+
+    employee_id = openapi.Parameter('id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING)   
+    @swagger_auto_schema(manual_parameters=[employee_id], request_body=Input_schema)
+
+    def post(self, request):
+        try:
+            user = request.user
+            account = user.account_set.first()
+            manager_id = account.id
+            newHoursWorked = request.data['hoursWorked']
+            date = request.data['date']
+            if newHoursWorked == None or date == None:
+                return Response({'status': False, 'message': "Invalid Input"}, status=status.HTTP_400_BAD_REQUEST)
+
+            employee_id = request.GET.get('id')
+            print(employee_id)
+            employee_accounts = Account.objects.filter(id=employee_id)
+            if len(employee_accounts) == 0:
+                return Response({'status': False, 'message': "Invalid employee id"}, status=status.HTTP_403_FORBIDDEN)
+
+            employee_account = employee_accounts[0]
+            if employee_account.manager == None or employee_account.manager.id != manager_id:
+                return Response({'status': False, 'message': "Data is forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+            time_entry = TimeEntry.objects.filter(account=employee_account, date=date).first()
+            if time_entry == None:
+                return Response({'status': False, 'message': "No time entry for the specific date"}, status=status.HTTP_400_BAD_REQUEST)
+
+            time_entry.hoursWorked = newHoursWorked
+            time_entry.save()
+
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
