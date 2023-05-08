@@ -12,7 +12,7 @@ from django.urls import path, re_path
 # Third Party Library imports
 
 # local imports.
-from account.views import Punch, GetStartTime, HoursWorked, Me, EditEmployeeWorkHour, GetEmployeeInfo
+from account.views import Punch, GetStartTime, HoursWorked, Me, EditEmployeeWorkHour, GetEmployeeInfo, GetEmployeeWorkHour
 
 app_name = 'accounts'
 
@@ -23,4 +23,6 @@ urlpatterns = [
     path('me', Me.as_view(), name = "get user information"),
     path('manager/employees/id', EditEmployeeWorkHour.as_view(), name = "edit employee info"),
     path('api/manager/employees', GetEmployeeInfo.as_view(), name = "get employee info"),
+    path('api/manager/employees/hoursWorked', GetEmployeeWorkHour.as_view(), name = "get employee info"),
+    
 ]
