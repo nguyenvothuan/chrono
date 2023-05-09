@@ -61,7 +61,7 @@ def dump_employee():
             account.save()
 
 
-@transaction.atomic
+# @transaction.atomic
 def dump_manager():
     for file in ["Onion_Technology-employees", "GizmoGram-employees", "LunchRock_LLC-employees", "Night_Owls_Inc-employees"]:
         with open(f"data_export/{file}.json") as f:
@@ -80,17 +80,17 @@ def dump_manager():
                 user.save()
 
 
-@transaction.atomic
+# @transaction.atomic
 def dump_time_entries():
     for file in ["LunchRock_LLC", "Onion_Technology", "Night_Owls_Inc", "GizmoGram"]:
         with open(f"data_export/{file}-time-entries.json") as f:
             time_entries = json.load(f)
             companyId = 1
-            if file == 'Onion_Technology':
+            if file == 'Night_Owls_Inc':
                 companyId = 1
             elif file == 'LunchRock_LLC':
                 companyId = 2
-            elif file == 'Night_Owls_Inc':
+            elif file == 'GizmoGram':
                 companyId = 3
             else:
                 companyId = 4
@@ -116,6 +116,7 @@ def dump_time_entries():
                             'clockedInEpochMillisecond'), entry.get('clockedOutEpochMillisecond'))
                         date = datetime.date.fromtimestamp(
                             entry.get('clockedInEpochMillisecond')/1000)
+                    print(file, hoursWorked)
                     # handle case when there are two clock in clock out a day
                     try:
                         newEntry, created = TimeEntry.objects.get_or_create(
@@ -135,5 +136,6 @@ def flush_time_entries():
 
 
 # dump_employee()
-# dump_time_entries()
-dump_manager()
+dump_time_entries()
+# dump_manager()
+# flush_time_entries()
