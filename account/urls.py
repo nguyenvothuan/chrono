@@ -22,7 +22,7 @@ urlpatterns = [
     path('punch-in-time', GetStartTime.as_view(), name = "get punch in time"),
     path('me', Me.as_view(), name = "get user information"),
     path('manager/employees/id', EditEmployeeWorkHour.as_view(), name = "edit employee info"),
-    path('api/manager/employees', GetEmployeeInfo.as_view(), name = "get employee info"),
-    path('api/manager/employees/hoursWorked', GetEmployeeWorkHour.as_view(), name = "get employee info"),
+    path('manager/employees', GetEmployeeInfo.as_view(), name = "get employee info"),
+    path('manager/employees/hoursWorked', GetEmployeeWorkHour.as_view(), name = "get employee info"),
     
 ]
